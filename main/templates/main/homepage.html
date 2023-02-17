@@ -1,0 +1,481 @@
+<head>
+  {% load static %}
+  <link href="{% static 'tinymce/css/prism.css' %}" rel="stylesheet" />
+  <!-- Compiled and minified CSS -->
+  <link href="{% static 'main/css/materialize.css' %}" rel="stylesheet" />
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+<body>
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs tabs-fixed-width tab-demo z-depth-1">
+        <div id="test-slider">
+          <form action="#">
+            <p class="range-field">
+              <input
+                type="range"
+                id="test5"
+                min="1"
+                max="600"
+                oninput="updateText(this.value)"
+                onchange="updateText(this.value)"
+              />
+              <input type="text" id="textInput" value="1" />
+            </p>
+          </form>
+        </div>
+        <p></p>
+        <a
+          onclick="indexFunc(0)"
+          class="waves-effect waves-light btn-large"
+          href="#"
+          >Bubblesort</a
+        >
+        <a
+          onclick="indexFunc(2)"
+          class="waves-effect waves-light btn-large"
+          href="#2"
+          >Mergesort</a
+        >
+        <a
+          onclick="indexFunc(3)"
+          class="waves-effect waves-light btn-large"
+          href="#"
+          >Quicksort</a
+        >
+        <a
+          onclick="indexFunc(1)"
+          class="waves-effect waves-light btn-large"
+          href="#"
+          >Heapsort</a
+        >
+        <a
+          onclick="indexFunc(4)"
+          class="waves-effect waves-light btn-large"
+          href="#"
+          >Selection sort</a
+        >
+        <a
+          onclick="doSort(index)"
+          class="waves-effect waves-light btn-large"
+          href="#"
+          >Run</a
+        >
+      </ul>
+    </div>
+  </div>
+  <canvas
+    id="myCanvas"
+    height="700px"
+    width="1800px"
+    style="border: 0px solid #000"
+  ></canvas>
+</body>
+<script>
+  let index = 0;
+  let sortViewer = [];
+  let auxiliaryArray = [];
+
+  const canvas = document.getElementById("myCanvas");
+  const context = canvas.getContext("2d");
+
+  function indexFunc(num) {
+    index = num;
+  }
+
+  function bubbleSort(arr) {
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr.length - i - 1; j++) {
+        if (arr[arr.length - 2 - j] > arr[arr.length - 1 - j]) {
+          [arr[arr.length - 2 - j], arr[arr.length - 1 - j]] = [
+            arr[arr.length - 1 - j],
+            arr[arr.length - 2 - j],
+          ];
+          sortViewer.push(arr.length - 2 - j);
+          sortViewer.push(arr.length - 1 - j);
+          sortViewer.push(true);
+        } else {
+          sortViewer.push(arr.length - 2 - j);
+          sortViewer.push(arr.length - 1 - j);
+          sortViewer.push(false);
+        }
+      }
+    }
+    return sortViewer;
+  }
+
+  function selectionSort(array) {
+    for (let i = 1; i < array.length; i++) {
+      for (let j = i - 1; j >= 0; j--) {
+        sortViewer.push(false);
+        sortViewer.push(i);
+        sortViewer.push(j);
+        let tmp = array[i];
+        if (array[i] > array[j]) {
+          sortViewer.push(true);
+          sortViewer.push(i);
+          sortViewer.push(j + 1);
+          array.splice(i, 1);
+          array.splice(j + 1, 0, tmp);
+          break;
+        }
+        if (j == 0) {
+          sortViewer.push(true);
+          sortViewer.push(i);
+          sortViewer.push(j);
+          array.splice(i, 1);
+          array.splice(j, 0, tmp);
+        }
+      }
+    }
+  }
+
+  function mergeSort(l, r) {
+    let l1 = l,
+      l2 = Math.floor((l + r) / 2) + 1,
+      r1 = Math.floor((l + r) / 2),
+      r2 = r;
+    sortViewer.splice(0, 0, [l1, r2]);
+    if (l != r) {
+      mergeSort(l2, r2);
+      mergeSort(l1, r1);
+    }
+  }
+
+  function merge(array) {
+    for (let j = 0; j < sortViewer.length; j++) {
+      if (sortViewer[j][0] != sortViewer[j][1]) {
+        let lLen = sortViewer[j - 1][0] - sortViewer[j][0],
+          rLen = sortViewer[j - 1][1] - sortViewer[j - 1][0] + 1,
+          leftA = array.slice(sortViewer[j][0], sortViewer[j - 1][0]),
+          rightA = array.slice(sortViewer[j - 1][0], sortViewer[j - 1][1] + 1),
+          l = 0,
+          r = 0;
+        sortViewer.push(false);
+        for (let k = 0; k < lLen + rLen; k++) {
+          sortViewer.push(sortViewer[j][0] + k);
+        }
+        sortViewer.push(true);
+        while (l < lLen && r < rLen) {
+          if (leftA[l] < rightA[r]) {
+            sortViewer.push(sortViewer[j][0] + l + r);
+            array.splice(sortViewer[j][0] + l + r, 1);
+            array.splice(sortViewer[j][0] + l + r, 0, leftA[l]);
+            sortViewer.push(array[sortViewer[j][0] + l + r]);
+            l += 1;
+          } else {
+            sortViewer.push(sortViewer[j][0] + l + r);
+            array.splice(sortViewer[j][0] + l + r, 1);
+            array.splice(sortViewer[j][0] + l + r, 0, rightA[r]);
+            sortViewer.push(array[sortViewer[j][0] + l + r]);
+            r += 1;
+          }
+        }
+        while (l < lLen) {
+          sortViewer.push(sortViewer[j][0] + l + r);
+          array.splice(sortViewer[j][0] + l + r, 1);
+          array.splice(sortViewer[j][0] + l + r, 0, leftA[l]);
+          sortViewer.push(array[sortViewer[j][0] + l + r]);
+          l += 1;
+        }
+        while (r < rLen) {
+          sortViewer.push(sortViewer[j][0] + l + r);
+          array.splice(sortViewer[j][0] + l + r, 1);
+          array.splice(sortViewer[j][0] + l + r, 0, rightA[r]);
+          sortViewer.push(array[sortViewer[j][0] + l + r]);
+          r += 1;
+        }
+      }
+    }
+  }
+
+  function heapSort(arr) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      let tmp = i;
+      let cont = true;
+      while (cont == true) {
+        cont = false;
+        let root = tmp;
+        let left = 2 * tmp + 1;
+        let right = 2 * tmp + 2;
+        sortViewer.push(root);
+        sortViewer.push(left);
+        sortViewer.push(right);
+        if (left < arr.length && arr[left] > arr[root]) {
+          root = left;
+        }
+        if (right < arr.length && arr[right] > arr[root]) {
+          root = right;
+        }
+        if (root != tmp) {
+          sortViewer.push(true);
+          sortViewer.push(root);
+          sortViewer.push(tmp);
+          [arr[tmp], arr[root]] = [arr[root], arr[tmp]];
+          tmp = root;
+          cont = true;
+        } else {
+          sortViewer.push(false);
+          sortViewer.push(-1);
+          sortViewer.push(-1);
+        }
+      }
+    }
+    let j = 1;
+    for (let i = arr.length - 1; i > 0; i--) {
+      sortViewer.push(-1);
+      sortViewer.push(-1);
+      sortViewer.push(-1);
+      sortViewer.push(true);
+      sortViewer.push(0);
+      sortViewer.push(arr.length - j);
+      j += 1;
+      [arr[0], arr[i]] = [arr[i], arr[0]];
+      cont = true;
+      tmp = 0;
+      while (cont == true) {
+        cont = false;
+        let root = tmp;
+        let left = 2 * tmp + 1;
+        let right = 2 * tmp + 2;
+        sortViewer.push(root);
+        sortViewer.push(left);
+        sortViewer.push(right);
+        if (left < i && arr[left] > arr[root]) {
+          root = left;
+        }
+        if (right < i && arr[right] > arr[root]) {
+          root = right;
+        }
+        if (root != tmp) {
+          sortViewer.push(true);
+          sortViewer.push(root);
+          sortViewer.push(tmp);
+          [arr[tmp], arr[root]] = [arr[root], arr[tmp]];
+          tmp = root;
+          cont = true;
+        } else {
+          sortViewer.push(false);
+          sortViewer.push(-1);
+          sortViewer.push(-1);
+        }
+      }
+    }
+  }
+
+  function quickSortBasic(arr1) {
+    let sortArr = [];
+    function quickSort(arr, partitions, sorter) {
+      let part = [];
+      let cont = false;
+      for (let num = 0; num < partitions.length / 2; num++) {
+        let left = partitions[2 * num];
+        let right = partitions[2 * num + 1] - 1;
+        let pivot = partitions[2 * num + 1];
+        if (left > right) {
+          continue;
+        } else {
+          cont = true;
+          while (left <= right) {
+            while (arr[left] < arr[pivot] && left < arr.length) {
+              sorter.push(left);
+              sorter.push(pivot);
+              left += 1;
+            }
+            while (arr[right] > arr[pivot] && right > 0) {
+              sorter.push(pivot);
+              sorter.push(right);
+              right -= 1;
+            }
+            if (left >= right) {
+              break;
+            } else {
+              sorter.push("tru");
+              sorter.push("tru");
+              sorter.push(left);
+              sorter.push(right);
+              [arr[left], arr[right]] = [arr[right], arr[left]];
+              left += 1;
+              right -= 1;
+            }
+          }
+          sorter.push("fals");
+          sorter.push("fals");
+          let y = left;
+          sorter.push(y);
+          let trem2 = partitions[2 * num + 1];
+          sorter.push(trem2);
+          let tmp = arr.splice(partitions[2 * num + 1], 1);
+          arr.splice(left, 0, tmp[0]);
+          part.push(partitions[2 * num]);
+          part.push(left - 1);
+          part.push(left + 1);
+          part.push(partitions[2 * num + 1]);
+        }
+      }
+      if (cont == true) {
+        quickSort(arr, part, sorter);
+      } else {
+        for (let i = 0; i < sorter.length; i++) {
+          sortViewer.push(sorter[i]);
+        }
+        return [1, sortViewer];
+      }
+    }
+    let sortingArr;
+    sortingArr = quickSort(arr1, [0, arr1.length - 1], sortArr);
+  }
+
+  function swap(arrt, i) {
+    let tmp = arrt[i[0]];
+    arrt[i[0]] = arrt[i[1]];
+    arrt[i[1]] = tmp;
+    return arrt;
+  }
+
+  function drawArray(arr5, numArr = []) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const barSizes = (canvas.width - 200) / arr5.length;
+    context.fillStyle = "blue";
+
+    for (let i = 0; i < arr5.length; i++) {
+      for (let j = 0; j < numArr.length; j++) {
+        if (i == numArr[j]) {
+          context.fillStyle = "red";
+        }
+      }
+      context.fillRect(200 + barSizes * i + 1, 0, barSizes - 1, arr5[i]);
+      context.fillStyle = "blue";
+    }
+  }
+
+  function createArray(num) {
+    array = [];
+    for (let i = 0; i < num; i++) {
+      array.push(Math.floor(Math.exp(Math.log(canvas.height) * Math.random())));
+    }
+    drawArray(array);
+  }
+
+  function updateText(num) {
+    document.getElementById("textInput").value = num;
+    createArray(num);
+  }
+
+  function doSort(index = 0) {
+    sortViewer = [];
+    auxiliaryArray = [...array];
+
+    if (index == 0) {
+      bubbleSort(array);
+      for (let i = 0; i < sortViewer.length; i = i + 3) {
+        setTimeout(function () {
+          if (sortViewer[i + 2] == true) {
+            auxiliaryArray = swap(auxiliaryArray, [
+              sortViewer[i],
+              sortViewer[i + 1],
+            ]);
+            drawArray(auxiliaryArray, [sortViewer[i], sortViewer[i + 1]]);
+          }
+        }, 0.001 * i);
+      }
+    } else if (index == 1) {
+      heapSort(array);
+      for (let i = 0; i < sortViewer.length; i = i + 3) {
+        setTimeout(function () {
+          if (i % 6 == 0) {
+            drawArray(auxiliaryArray, [
+              sortViewer[i],
+              sortViewer[i + 1],
+              sortViewer[i + 2],
+            ]);
+          } else {
+            if (sortViewer[i] == true) {
+              auxiliaryArray = swap(auxiliaryArray, [
+                sortViewer[i + 2],
+                sortViewer[i + 1],
+              ]);
+            }
+            drawArray(auxiliaryArray);
+          }
+        }, 0.001 * i);
+      }
+    } else if (index == 2) {
+      mergeSort(0, array.length - 1);
+      merge(array);
+      let currCond = false;
+      let currJ = 0;
+      for (let i = 0; i < sortViewer.length; i++) {
+        setTimeout(function () {
+          if (currCond === false) {
+            if (sortViewer[i] === true || sortViewer[i] === false) {
+              currCond = sortViewer[i];
+            } else {
+              drawArray(auxiliaryArray, sortViewer[i]);
+            }
+          } else {
+            if (sortViewer[i] === true || sortViewer[i] === false) {
+              currCond = sortViewer[i];
+            } else {
+              if (currJ % 2 == 0) {
+                drawArray(auxiliaryArray, sortViewer[i]);
+                auxiliaryArray.splice(sortViewer[i], 1);
+                auxiliaryArray.splice(sortViewer[i], 0, sortViewer[i + 1]);
+                currJ += 1;
+              } else {
+                drawArray(auxiliaryArray);
+                currJ += 1;
+              }
+            }
+          }
+        }, 0.001 * i);
+      }
+    } else if (index == 3) {
+      quickSortBasic(array);
+      for (let i = 0; i < sortViewer.length; i++) {
+        setTimeout(function () {
+          if (sortViewer[i] == "tru") {
+            if (sortViewer[i + 1] == "tru") {
+              drawArray(auxiliaryArray, [sortViewer[i + 2], sortViewer[i + 3]]);
+              auxiliaryArray = swap(auxiliaryArray, [
+                sortViewer[i + 2],
+                sortViewer[i + 3],
+              ]);
+            } else {
+              drawArray(auxiliaryArray);
+            }
+          } else if (sortViewer[i] == "fals") {
+            if (sortViewer[i + 1] == "fals") {
+              drawArray(auxiliaryArray, [sortViewer[i + 3]]);
+              let tmp = auxiliaryArray.splice(sortViewer[i + 3], 1);
+              auxiliaryArray.splice(sortViewer[i + 2], 0, tmp[0]);
+            } else {
+              drawArray(auxiliaryArray);
+            }
+          } else if (i % 2 == 0) {
+            drawArray(auxiliaryArray, [sortViewer[i], sortViewer[i + 1]]);
+          } else {
+            drawArray(auxiliaryArray);
+          }
+        }, 0.001 * i);
+      }
+    } else if (index == 4) {
+      selectionSort(array);
+      for (let i = 0; i < sortViewer.length; i = i + 3) {
+        setTimeout(function () {
+          if (sortViewer[i] === true) {
+            let tmp = auxiliaryArray[sortViewer[i + 1]];
+            auxiliaryArray.splice(sortViewer[i + 1], 1);
+            auxiliaryArray.splice(sortViewer[i + 2], 0, tmp);
+          }
+          drawArray(auxiliaryArray, [sortViewer[i + 1], sortViewer[i + 2] - 1]);
+        }, 10 * i);
+      }
+    }
+    drawArray(auxiliaryArray);
+  }
+</script>
+<!-- Prism JS -->
+<script src="{% static 'tinymce/js/prism.js' %}"></script>
