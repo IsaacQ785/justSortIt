@@ -246,55 +246,52 @@
       }
     }
   }
-
-  function quickSortBasic(array) {
-    function quickSort(arr, partitions) {
-      let part = [];
-      let cont = false;
-      for (let num = 0; num < partitions.length / 2; num++) {
-        let left = partitions[2 * num];
-        let right = partitions[2 * num + 1] - 1;
-        let pivot = partitions[2 * num + 1];
-        if (left <= right) {
-          cont = true;
-          while (left <= right) {
-            while (arr[left] < arr[pivot] && left < arr.length) {
-              sortViewer.push(left);
-              sortViewer.push(pivot);
-              left += 1;
-            }
-            while (arr[right] > arr[pivot] && right > 0) {
-              sortViewer.push(pivot);
-              sortViewer.push(right);
-              right -= 1;
-            }
-            if (left >= right) {
-              break;
-            } else {
-              sortViewer.push(true);
-              sortViewer.push(true);
-              sortViewer.push(left);
-              sortViewer.push(right);
-              [arr[left], arr[right]] = [arr[right], arr[left]];
-              left += 1;
-              right -= 1;
-            }
+  
+  function quickSort(array, partitions) {
+    let part = [];
+    let cont = false;
+    for (let num = 0; num < partitions.length / 2; num++) {
+      let left = partitions[2 * num];
+      let right = partitions[2 * num + 1] - 1;
+      let pivot = partitions[2 * num + 1];
+      if (left <= right) {
+        cont = true;
+        while (left <= right) {
+          while (array[left] < array[pivot] && left < array.length) {
+            sortViewer.push(left);
+            sortViewer.push(pivot);
+            left += 1;
           }
-          sortViewer.push(false);
-          sortViewer.push(false);
-          sortViewer.push(left);
-          sortViewer.push(partitions[2 * num + 1]);
-          let tmp = arr.splice(partitions[2 * num + 1], 1);
-          arr.splice(left, 0, tmp[0]);
-          part.push(partitions[2 * num]);
-          part.push(left - 1);
-          part.push(left + 1);
-          part.push(partitions[2 * num + 1]);
+          while (array[right] > array[pivot] && right > 0) {
+            sortViewer.push(pivot);
+            sortViewer.push(right);
+            right -= 1;
+          }
+          if (left >= right) {
+            break;
+          } else {
+            sortViewer.push(true);
+            sortViewer.push(true);
+            sortViewer.push(left);
+            sortViewer.push(right);
+            [array[left], array[right]] = [array[right], array[left]];
+            left += 1;
+            right -= 1;
+          }
         }
+        sortViewer.push(false);
+        sortViewer.push(false);
+        sortViewer.push(left);
+        sortViewer.push(partitions[2 * num + 1]);
+        let tmp = array.splice(partitions[2 * num + 1], 1);
+        array.splice(left, 0, tmp[0]);
+        part.push(partitions[2 * num]);
+        part.push(left - 1);
+        part.push(left + 1);
+        part.push(partitions[2 * num + 1]);
       }
-      if (cont == true) quickSort(arr, part);
     }
-    quickSort(array, [0, array.length - 1]);
+    if (cont == true) quickSort(array, part);
   }
 
   function swap(array, i) {
@@ -346,7 +343,7 @@
             ]);
             drawArray(auxiliaryArray, [sortViewer[i], sortViewer[i + 1]]);
           }
-        }, 0.001 * i);
+        }, 1 * i);
       }
     } else if (index == 1) {
       heapSort(array);
@@ -367,7 +364,7 @@
             }
             drawArray(auxiliaryArray);
           }
-        }, 0.001 * i);
+        }, 1 * i);
       }
     } else if (index == 2) {
       mergeSort(0, array.length - 1);
@@ -397,10 +394,10 @@
               }
             }
           }
-        }, 0.001 * i);
+        }, 1 * i);
       }
     } else if (index == 3) {
-      quickSortBasic(array);
+      quickSort(array, [0, array.length - 1]);
       for (let i = 0; i < sortViewer.length; i++) {
         setTimeout(function () {
           if (sortViewer[i] === true) {
@@ -426,7 +423,7 @@
           } else {
             drawArray(auxiliaryArray);
           }
-        }, 0.001 * i);
+        }, 1 * i);
       }
     } else if (index == 4) {
       selectionSort(array);
@@ -438,7 +435,7 @@
             auxiliaryArray.splice(sortViewer[i + 2], 0, tmp);
           }
           drawArray(auxiliaryArray, [sortViewer[i + 1], sortViewer[i + 2] - 1]);
-        }, 0.001 * i);
+        }, 1 * i);
       }
     }
     drawArray(auxiliaryArray);
